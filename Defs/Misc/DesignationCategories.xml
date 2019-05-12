@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+<!--============================== Orthogonal things ==============================-->
+
+ 
+  
+  <DesignationCategoryDef>
+    <defName>RBK_Botanics</defName>
+    <label>Botanics</label>
+    <description>Botanic Rim machines</description>
+    <order>450</order>
+    <specialDesignatorClasses>
+      <li>Designator_Cancel</li>
+      <li>Designator_Deconstruct</li>
+    </specialDesignatorClasses>
+  </DesignationCategoryDef>
+  
+   
+
+
+
+</Defs>

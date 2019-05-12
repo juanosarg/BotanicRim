@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>  
+  <ThingDef ParentName="PlantFoodRawBase">
+    <defName>RBK_Raw_CommonWheat</defName>
+    <label>common wheat</label>
+    <description>Wheat is a grass widely cultivated for its seed, a cereal grain. Wheat has a protein content of about 13%, which is relatively high compared to other major cereals. Wheat can be turned into flour using a wheat grinder.</description>
+    <soundInteract>Grain_Drop</soundInteract>
+    <soundDrop>Grain_Drop</soundDrop>	
+   
+    <graphicData>
+	   
+      <texPath>Things/Item/RBK_HarvestedWheat</texPath>
+	   
+    </graphicData>
+    <statBases>
+      <MarketValue>1.1</MarketValue>
+    </statBases>
+    <comps>
+      <li Class="CompProperties_Rottable">
+        <daysToRotStart>60</daysToRotStart>
+		    <rotDestroys>true</rotDestroys>
+      </li>
+    </comps>
+	 
+    <ingestible>
+<foodType>VegetableOrFruit</foodType>
+    </ingestible>    
+  </ThingDef>
+  
+    <ThingDef ParentName="PlantFoodRawBase">
+    <defName>RBK_Raw_SugarBeets</defName>
+    <label>sugar beets</label>
+    <description>A sugar beet is a plant whose root contains a high concentration of sucrose and which is grown for sugar production. Sugar beets grow exclusively in the temperate zone, in contrast to sugarcane, which grows exclusively in the tropical and subtropical zones. Sugar Beets can be turned into sugar.</description>
+    <soundInteract>Grain_Drop</soundInteract>
+    <soundDrop>Grain_Drop</soundDrop>	
+   
+    <graphicData>
+	   
+      <texPath>Things/Item/RBK_HarvestedSugarBeets</texPath>
+	   
+    </graphicData>
+    <statBases>
+      <MarketValue>1.1</MarketValue>
+    </statBases>
+    <comps>
+      <li Class="CompProperties_Rottable">
+        <daysToRotStart>60</daysToRotStart>
+		    <rotDestroys>true</rotDestroys>
+      </li>
+    </comps>
+	 
+    <ingestible>
+<foodType>VegetableOrFruit</foodType>
+    </ingestible>    
+  </ThingDef>
+  
+   
+  
+  
+  
+</Defs>

@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!--=========================== Food crops ==============================-->
+
+  <ThingDef ParentName="PlantBase">
+    <defName>RBK_Plant_CommonWheat</defName>
+    <label>common wheat plant</label>
+    <description>Wheat is a grass widely cultivated for its seed, a cereal grain. Wheat has a protein content of about 13%, which is relatively high compared to other major cereals.</description>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <Nutrition>0.3</Nutrition>
+    </statBases>
+    <graphicData>
+      <texPath>Things/Plant/RBK_CommonWheatMature</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+	 
+    </graphicData>
+    <selectable>true</selectable>
+    <pathCost>12</pathCost>
+    <ingestible />
+    <plant>
+      <fertilityMin>0.70</fertilityMin>
+			<dieIfLeafless>true</dieIfLeafless>
+			<harvestTag>Standard</harvestTag>
+			<harvestedThingDef>RBK_Raw_CommonWheat</harvestedThingDef>
+			<harvestYield>9</harvestYield>
+			<sowTags>
+				
+				<li>RBK_Hydroponic</li>			</sowTags>
+			<topWindExposure>0.2</topWindExposure>
+			<growDays>4</growDays>
+      <immatureGraphicPath>Things/Plant/RBK_CommonWheatInmature</immatureGraphicPath>
+			<visualSizeRange>
+        <min>0.5</min>
+        <max>1.75</max>
+      </visualSizeRange>
+      <wildOrder>2</wildOrder>
+      <purpose>Food</purpose>
+    </plant>
+  </ThingDef>
+  
+   <ThingDef ParentName="PlantBase">
+    <defName>RBK_Plant_SugarBeet</defName>
+    <label>sugar beet plant</label>
+    <description>A sugar beet is a plant whose root contains a high concentration of sucrose and which is grown for sugar production. Sugar beets grow exclusively in the temperate zone, in contrast to sugarcane, which grows exclusively in the tropical and subtropical zones.</description>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <Nutrition>0.3</Nutrition>
+    </statBases>
+    <graphicData>
+      <texPath>Things/Plant/RBK_SugarBeetMature</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <selectable>true</selectable>
+    <pathCost>10</pathCost>
+    <ingestible />
+    <plant>
+      <fertilityMin>0.70</fertilityMin>
+			<dieIfLeafless>true</dieIfLeafless>
+			<harvestTag>Standard</harvestTag>
+						<maxMeshCount>4</maxMeshCount>
+
+			<harvestedThingDef>RBK_Raw_SugarBeets</harvestedThingDef>
+			<harvestYield>5</harvestYield>
+			<sowTags>
+
+				<li>RBK_Hydroponic</li>			</sowTags>
+			<topWindExposure>0.2</topWindExposure>
+			<growDays>3.75</growDays>
+      <immatureGraphicPath>Things/Plant/RBK_SugarBeetInmature</immatureGraphicPath>
+			<visualSizeRange>
+        <min>0.4</min>
+        <max>0.8</max>
+      </visualSizeRange>
+      <wildOrder>2</wildOrder>
+      <purpose>Food</purpose>
+    </plant>
+  </ThingDef>
+
+	
+
+
+</Defs>
