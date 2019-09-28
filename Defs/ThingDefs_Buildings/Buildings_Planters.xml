@@ -1,64 +1,67 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs> 
 
- <ThingDef ParentName="BuildingBase">
-    <defName>RBK_BasicFoodPlanter</defName>
-    <label>basic food planter (tier 1)</label>
-    <description>An artificial nutrient bath for growing plants. The nutrients pumps must work continuously; the plants will die if power is cut.</description>
-    <thingClass>BotanicRim.Building_BotanicGrower</thingClass>
-    <graphicData>
-      <texPath>Things/Building/Planters/RBK_Tier1Planter</texPath>
-      <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(3.5,2)</drawSize>
-      <damageData>
-        <cornerTL>Damage/Corner</cornerTL>
-        <cornerTR>Damage/Corner</cornerTR>
-        <cornerBL>Damage/Corner</cornerBL>
-        <cornerBR>Damage/Corner</cornerBR>
-      </damageData>
-    </graphicData>
-    <castEdgeShadows>true</castEdgeShadows>
-    <altitudeLayer>FloorEmplacement</altitudeLayer>
-    <passability>PassThroughOnly</passability>
-    <pathCost>60</pathCost>
-    <constructEffect>ConstructMetal</constructEffect>
-    <fillPercent>0.20</fillPercent>
-    <canOverlapZones>false</canOverlapZones>
-    <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
-    <statBases>
-      <WorkToBuild>2800</WorkToBuild>
-      <MaxHitPoints>180</MaxHitPoints>
-      <Flammability>0.5</Flammability>
-      <Cleanliness>-3</Cleanliness>
-    </statBases>
-    <size>(3,1)</size>
-    <costList>
-      <Steel>100</Steel>
-      <ComponentIndustrial>1</ComponentIndustrial>
-    </costList>
-	<designatorDropdown>RBK_SimpleFoodPlanters</designatorDropdown>
-    <fertility>1</fertility>
-    <building>
-      <defaultPlantToGrow>RBK_Plant_CommonWheat</defaultPlantToGrow>
-      <sowTag>RBK_Hydroponic</sowTag>
-    </building>
-   
-    <comps>
-      <li Class="CompProperties_Forbiddable"/>
-	  <li><compClass>CompQuality</compClass> </li>
-     
-    </comps>
-    <researchPrerequisites>
-      <li>Hydroponics</li>
-    </researchPrerequisites>
-	 <tickerType>Rare</tickerType>
-    <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
-    <designationCategory>RBK_Botanics</designationCategory>
-  </ThingDef>
-  
- 
+	<ThingDef ParentName="BuildingBase">
+		<defName>BR_BasicFoodPlanter</defName>
+		<label>basic food planter (tier 1)</label>
+		<description>An artificial nutrient bath for growing plants. The nutrients pumps must work continuously; the plants will die if power is cut.</description>
+		<thingClass>BotanicRim.Building_BotanicGrower</thingClass>
+		<graphicData>
+			<texPath>Things/Building/Planters/RBK_Tier1Planter</texPath>
+			<graphicClass>Graphic_Multi</graphicClass>
+			<drawSize>(3.5,2)</drawSize>
+			<damageData>
+				<cornerTL>Damage/Corner</cornerTL>
+				<cornerTR>Damage/Corner</cornerTR>
+				<cornerBL>Damage/Corner</cornerBL>
+				<cornerBR>Damage/Corner</cornerBR>
+			</damageData>
+		</graphicData>
+		<castEdgeShadows>true</castEdgeShadows>
+		<altitudeLayer>FloorEmplacement</altitudeLayer>
+		<passability>PassThroughOnly</passability>
+		<pathCost>60</pathCost>
+		<constructEffect>ConstructMetal</constructEffect>
+		<fillPercent>0.20</fillPercent>
+		<canOverlapZones>false</canOverlapZones>
+		<constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+		<statBases>
+			<WorkToBuild>2800</WorkToBuild>
+			<MaxHitPoints>180</MaxHitPoints>
+			<Flammability>0.5</Flammability>
+			<Cleanliness>-3</Cleanliness>
+		</statBases>
+		<size>(3,1)</size>
+		<costList>
+			<Steel>100</Steel>
+			<ComponentIndustrial>1</ComponentIndustrial>
+		</costList>
+		<designatorDropdown>RBK_SimpleFoodPlanters</designatorDropdown>
+		<fertility>1</fertility>
+		<building>
+			<defaultPlantToGrow>BR_Plant_CommonWheat</defaultPlantToGrow>
+			<sowTag>BR_Hydroponic</sowTag>
+		</building>
 
-	
+		<comps>
+			<li Class="CompProperties_Forbiddable"/>
+			<li><compClass>CompQuality</compClass> </li>
+			<li Class="BotanicRim.CompProperties_BotanyPlanter">
+				<isBotanyPlanter>true</isBotanyPlanter>
+			</li>
+
+		</comps>
+		<researchPrerequisites>
+			<li>Hydroponics</li>
+		</researchPrerequisites>
+		<tickerType>Rare</tickerType>
+		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
+		<designationCategory>RBK_Botanics</designationCategory>
+	</ThingDef>
+
+
+
+
 
 
 </Defs>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+
+  
+  <!-- ============= Growing ============= -->
+
+  <WorkGiverDef>
+    <defName>BR_HarvestBotany</defName>
+    <label>harvest crops</label>
+    <giverClass>BotanicRim.WorkGiver_GrowerHarvestBotany</giverClass>
+    <workType>BR_Botany</workType>
+    <priorityInType>100</priorityInType>
+    <verb>harvest</verb>
+    <gerund>harvesting</gerund>
+    <scanThings>false</scanThings>
+    <scanCells>true</scanCells>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+
+  <WorkGiverDef>
+    <defName>BR_SowBotany</defName>
+    <label>sow crops</label>
+    <giverClass>BotanicRim.WorkGiver_GrowerSowBotany</giverClass>
+    <workType>BR_Botany</workType>
+    <priorityInType>50</priorityInType>
+    <verb>sow</verb>
+    <gerund>sowing</gerund>
+    <scanThings>false</scanThings>
+    <scanCells>true</scanCells>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
+  
+ 
+
+</Defs>

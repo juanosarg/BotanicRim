@@ -27,7 +27,7 @@
     </ingestible>    
   </ThingDef>
   
-    <ThingDef ParentName="PlantFoodRawBase">
+   <!-- <ThingDef ParentName="PlantFoodRawBase">
     <defName>RBK_Raw_SugarBeets</defName>
     <label>sugar beets</label>
     <description>A sugar beet is a plant whose root contains a high concentration of sucrose and which is grown for sugar production. Sugar beets grow exclusively in the temperate zone, in contrast to sugarcane, which grows exclusively in the tropical and subtropical zones. Sugar Beets can be turned into sugar.</description>
@@ -52,7 +52,7 @@
     <ingestible>
 <foodType>VegetableOrFruit</foodType>
     </ingestible>    
-  </ThingDef>
+  </ThingDef>-->
   
    
   

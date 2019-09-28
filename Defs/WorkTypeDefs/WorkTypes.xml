@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+
+
+  <WorkTypeDef>
+    <defName>BR_Botany</defName>
+    <labelShort>Botany</labelShort>
+    <pawnLabel>Botanist</pawnLabel>
+    <gerundLabel>growing</gerundLabel>
+    <description>Plant seeds and harvest crops in special botany growing areas.</description>
+    <verb>Grow</verb>
+    <naturalPriority>650</naturalPriority>
+    <requireCapableColonist>true</requireCapableColonist>
+    <relevantSkills>
+      <li>Plants</li>
+    </relevantSkills>
+    <workTags>
+      <li>ManualSkilled</li>
+      <li>PlantWork</li>
+    </workTags>
+  </WorkTypeDef>
+
+ 
+
+</Defs>
