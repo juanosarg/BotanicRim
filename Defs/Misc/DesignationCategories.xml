@@ -7,7 +7,7 @@
   
   <DesignationCategoryDef>
     <defName>RBK_Botanics</defName>
-    <label>Botanics</label>
+    <label>Botany</label>
     <description>Botanic Rim machines</description>
     <order>450</order>
     <specialDesignatorClasses>
