@@ -1,29 +1,47 @@
-﻿using System;
-using System.Linq;
-using Harmony;
-using RimWorld;
+﻿using RimWorld;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace BotanicRim
 {
-    public class CompPipe : ThingComp
+    public abstract class CompPipe : ThingComp
     {
-        public bool closed
+
+        public NutrientPipeNet transNet;
+
+        public CompPipe connectParent;
+
+        public List<CompPipe> connectChildren;
+
+        private static List<NutrientPipeNet> recentlyConnectedNets = new List<NutrientPipeNet>();
+
+        private static CompPipe lastManualReconnector = null;
+
+        public static readonly float WattsToWattDaysPerTick = 1.66666669E-05f;
+
+        public bool TransmitsPowerNow
         {
             get
             {
-                return this.flicker != null && !this.flicker.SwitchIsOn;
+                return ((Building)this.parent).TransmitsPowerNow;
             }
         }
 
-        public int GridID { get; set; } = -1;
-
-        public PipeType mode
+        public NutrientPipeNet NutrientPipeNet
         {
             get
             {
-                return this.Props.mode;
+                if (this.transNet != null)
+                {
+                    return this.transNet;
+                }
+                if (this.connectParent != null)
+                {
+                    return this.connectParent.transNet;
+                }
+                return null;
             }
         }
 
@@ -35,111 +53,157 @@ namespace BotanicRim
             }
         }
 
-        public override string CompInspectStringExtra()
+        public virtual void ResetPowerVars()
         {
-            if (DebugSettings.godMode)
+            this.transNet = null;
+            this.connectParent = null;
+            this.connectChildren = null;
+            CompPipe.recentlyConnectedNets.Clear();
+            CompPipe.lastManualReconnector = null;
+        }
+
+        public virtual void SetUpPowerVars()
+        {
+        }
+
+        public override void PostExposeData()
+        {
+            Thing thing = null;
+            if (Scribe.mode == LoadSaveMode.Saving && this.connectParent != null)
             {
-                return this.mode.ToString() + "_ID:" + this.GridID;
+                thing = this.connectParent.parent;
             }
-            return null;
-        }
-
-        public override void ReceiveCompSignal(string signal)
-        {
-            base.ReceiveCompSignal(signal);
-            if (signal == "FlickedOn" || signal == "FlickedOff")
+            Scribe_References.Look<Thing>(ref thing, "parentThing", false);
+            if (thing != null)
             {
-                this.MapComp.DirtyPipeGrid(this.mode);
-                this.MapComp.RegenGrids();
+                this.connectParent = ((ThingWithComps)thing).GetComp<CompPipe>();
             }
-        }
-
-        public override void PostDeSpawn(Map map)
-        {
-            map.GetComponent<PipeMapComponent>().DeregisterPipe(this);
-            this.pipeNet.DeregisterPipe(this.parent);
-            base.PostDeSpawn(map);
-        }
-
-        public override void CompTick()
-        {
-            base.CompTick();
-            if (this.parent.IsHashIntervalTick(3))
+            if (Scribe.mode == LoadSaveMode.PostLoadInit && this.connectParent != null)
             {
-                if (this.fuel != null)
-                {
-                    if (this.fuel.configuredTargetFuelLevel == -1f)
-                    {
-                        if (this.fuel.Props.fuelCapacity - this.fuel.Fuel >= 1f)
-                        {
-                            float num = Mathf.Min(1f, this.fuel.Props.fuelCapacity - this.fuel.Fuel);
-                            if (this.pipeNet != null && this.pipeNet.PullFuel((double)num))
-                            {
-                                this.fuel.Refuel(num);
-                            }
-                        }
-                    }
-                    else if (this.fuel.TargetFuelLevel - this.fuel.Fuel >= 1f)
-                    {
-                        float num2 = Mathf.Min(1f, this.fuel.TargetFuelLevel - this.fuel.Fuel);
-                        if (this.pipeNet != null && this.pipeNet.PullFuel((double)num2))
-                        {
-                            this.fuel.Refuel(num2);
-                        }
-                    }
-                }
-                if (this.GetFuelCountToFullyRefuel != null && this.GetFuelCountToFullyRefuel.GetValue<int>() > 1 && this.pipeNet != null && this.pipeNet.PullFuel(1.0))
-                {
-                    this.Chemfuel.Value += 1f;
-                }
+                this.ConnectToTransmitter(this.connectParent, true);
             }
         }
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
-            /*if (this.parent is Building_Valve)
-            {
-                this.flicker = this.parent.GetComp<CompFlickable>();
-            }*/
-            this.fuel = this.parent.GetComp<CompRefuelable>();
-            if (this.fuel != null && !this.fuel.Props.fuelFilter.Allows(ThingDefOf.Chemfuel))
-            {
-                this.fuel = null;
-            }
-            this.MapComp = this.parent.Map.GetComponent<PipeMapComponent>();
-            foreach (Thing thing in this.parent.Position.GetThingList(this.parent.Map).ToList<Thing>())
-            {
-                if (thing != this.parent && thing.TryGetComp<CompPipe>() != null && thing.TryGetComp<CompPipe>().mode == this.mode)
-                {
-                    thing.Destroy(DestroyMode.Vanish);
-                }
-            }
-            this.parent.Map.GetComponent<PipeMapComponent>().RegisterPipe(this, respawningAfterLoad);
             base.PostSpawnSetup(respawningAfterLoad);
-            
-        }
-
-        public void PrintForGrid(SectionLayer layer)
-        {
-            if (!this.closed)
+            if (this.Props.transmitsPower || this.parent.def.ConnectToPower)
             {
-                GraphicsCache.pipeOverlayDick[(int)this.mode].Print(layer, this.parent);
+                this.parent.Map.mapDrawer.MapMeshDirty(this.parent.Position, MapMeshFlag.PowerGrid, true, false);
+                if (this.Props.transmitsPower)
+                {
+                    this.parent.Map.GetComponent<PipeMapComponent>().Notify_TransmitterSpawned(this);
+                }
+                if (this.parent.def.ConnectToPower)
+                {
+                    this.parent.Map.GetComponent<PipeMapComponent>().Notify_ConnectorWantsConnect(this);
+                }
+                this.SetUpPowerVars();
             }
         }
 
-        public CompFlickable flicker;
+        public override void PostDeSpawn(Map map)
+        {
+            base.PostDeSpawn(map);
+            if (this.Props.transmitsPower || this.parent.def.ConnectToPower)
+            {
+                if (this.Props.transmitsPower)
+                {
+                    if (this.connectChildren != null)
+                    {
+                        for (int i = 0; i < this.connectChildren.Count; i++)
+                        {
+                            this.connectChildren[i].LostConnectParent();
+                        }
+                    }
+                    map.GetComponent<PipeMapComponent>().Notify_TransmitterDespawned(this);
+                }
+                if (this.parent.def.ConnectToPower)
+                {
+                    map.GetComponent<PipeMapComponent>().Notify_ConnectorDespawned(this);
+                }
+                map.mapDrawer.MapMeshDirty(this.parent.Position, MapMeshFlag.PowerGrid, true, false);
+            }
+        }
 
-        public NutrientPipeNet pipeNet;
+        public virtual void LostConnectParent()
+        {
+            this.connectParent = null;
+            if (this.parent.Spawned)
+            {
+                this.parent.Map.GetComponent<PipeMapComponent>().Notify_ConnectorWantsConnect(this);
+            }
+        }
 
-        private CompRefuelable fuel;
+        public override void PostPrintOnto(SectionLayer layer)
+        {
+            base.PostPrintOnto(layer);
+            if (this.connectParent != null)
+            {
+                PowerNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, false);
+            }
+        }
 
-        public PipeMapComponent MapComp;
+        public override void CompPrintForPowerGrid(SectionLayer layer)
+        {
+            if (this.TransmitsPowerNow)
+            {
+                PowerOverlayMats.LinkedOverlayGraphic.Print(layer, this.parent);
+            }
+            if (this.parent.def.ConnectToPower)
+            {
+                PowerNetGraphics.PrintOverlayConnectorBaseFor(layer, this.parent);
+            }
+            if (this.connectParent != null)
+            {
+                PowerNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, true);
+            }
+        }
 
-        public Building puProc;
 
-        private Traverse GetFuelCountToFullyRefuel;
 
-        private Traverse<float> Chemfuel;
+      
+
+        public void ConnectToTransmitter(CompPipe transmitter, bool reconnectingAfterLoading = false)
+        {
+            if (this.connectParent != null && (!reconnectingAfterLoading || this.connectParent != transmitter))
+            {
+                Log.Error(string.Concat(new object[]
+                {
+                    "Tried to connect ",
+                    this,
+                    " to transmitter ",
+                    transmitter,
+                    " but it's already connected to ",
+                    this.connectParent,
+                    "."
+                }), false);
+                return;
+            }
+            this.connectParent = transmitter;
+            if (this.connectParent.connectChildren == null)
+            {
+                this.connectParent.connectChildren = new List<CompPipe>();
+            }
+            transmitter.connectChildren.Add(this);
+            NutrientPipeNet pipeNet = this.NutrientPipeNet;
+            if (pipeNet != null)
+            {
+                pipeNet.RegisterConnector(this);
+            }
+        }
+
+        public override string CompInspectStringExtra()
+        {
+            if (this.NutrientPipeNet == null)
+            {
+                return "PowerNotConnected".Translate();
+            }
+            string value = (this.NutrientPipeNet.CurrentEnergyGainRate() / CompPower.WattsToWattDaysPerTick).ToString("F0");
+            string value2 = this.NutrientPipeNet.CurrentStoredEnergy().ToString("F0");
+            return "PowerConnectedRateStored".Translate(value, value2);
+        }
+
+       
     }
 }
-

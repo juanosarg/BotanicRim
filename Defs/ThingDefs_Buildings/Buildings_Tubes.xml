@@ -41,7 +41,11 @@
     <costList>
       <Steel>1</Steel>
     </costList>
-    
+     <comps>
+      <li Class="BotanicRim.CompProperties_Pipe">
+       
+      </li>
+    </comps>
     <placeWorkers>
       <li>PlaceWorker_Conduit</li>
     </placeWorkers>

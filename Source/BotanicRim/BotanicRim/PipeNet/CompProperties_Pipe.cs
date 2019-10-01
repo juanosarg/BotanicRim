@@ -9,11 +9,6 @@ namespace BotanicRim
         {
             this.compClass = typeof(CompPipe);
         }
-
-        public Type PipeNetClass = typeof(NutrientPipeNet);
-
-        public PipeType mode;
-
-        public bool stuffed;
+        public bool transmitsPower = true;
     }
 }

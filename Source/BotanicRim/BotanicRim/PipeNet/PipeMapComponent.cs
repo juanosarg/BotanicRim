@@ -1,181 +1,287 @@
-﻿using System;
+﻿using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
 namespace BotanicRim
 {
-    public abstract class PipeMapComponent : MapComponent
+    public class PipeMapComponent : MapComponent
     {
+        public enum DelayedActionType
+        {
+            RegisterTransmitter,
+            DeregisterTransmitter,
+            RegisterConnector,
+            DeregisterConnector
+        }
 
-        public List<NutrientPipeNet> PipeNets = new List<NutrientPipeNet>();
+        public struct DelayedAction
+        {
+            public DelayedActionType type;
 
-        public List<CompPipe> cachedPipes = new List<CompPipe>();
+            public CompPipe compPipe;
 
-        public int masterID;
+            public IntVec3 position;
 
-        public int[,] PipeGrid;
+            public Rot4 rotation;
 
-        public bool[] DirtyPipeFlag;
+            public DelayedAction(DelayedActionType type, CompPipe compPipe)
+            {
+                this.type = type;
+                this.compPipe = compPipe;
+                this.position = compPipe.parent.Position;
+                this.rotation = compPipe.parent.Rotation;
+            }
+        }
+
+       
 
         public PipeMapComponent(Map map) : base(map)
         {
-            int length = Enum.GetValues(typeof(PipeType)).Length;
-            this.PipeGrid = new int[length, map.cellIndices.NumGridCells];
-            this.DirtyPipeFlag = new bool[length];
-            for (int i = 0; i < this.DirtyPipeFlag.Length; i++)
+
+        }
+
+
+        private List<NutrientPipeNet> allNets = new List<NutrientPipeNet>();
+
+        private List<DelayedAction> delayedActions = new List<DelayedAction>();
+
+        public List<NutrientPipeNet> AllNetsListForReading
+        {
+            get
             {
-                this.DirtyPipeFlag[i] = true;
+                return this.allNets;
             }
+        }
+
+        public override void FinalizeInit()
+        {
+
+            base.FinalizeInit();
+          
         }
 
         public override void MapComponentTick()
         {
             base.MapComponentTick();
-            foreach (NutrientPipeNet pipelineNet in this.PipeNets)
+            this.UpdatePipeNetsAndConnections_First();
+        }
+
+        public void Notify_TransmitterSpawned(CompPipe newTransmitter)
+        {
+            this.delayedActions.Add(new DelayedAction(DelayedActionType.RegisterTransmitter, newTransmitter));
+            this.NotifyDrawersForWireUpdate(newTransmitter.parent.Position);
+        }
+
+        public void Notify_TransmitterDespawned(CompPipe oldTransmitter)
+        {
+            this.delayedActions.Add(new DelayedAction(DelayedActionType.DeregisterTransmitter, oldTransmitter));
+            this.NotifyDrawersForWireUpdate(oldTransmitter.parent.Position);
+        }
+
+        public void Notfiy_TransmitterTransmitsPowerNowChanged(CompPipe transmitter)
+        {
+            if (!transmitter.parent.Spawned)
             {
-                pipelineNet.Tick();
+                return;
+            }
+            this.delayedActions.Add(new DelayedAction(DelayedActionType.DeregisterTransmitter, transmitter));
+            this.delayedActions.Add(new DelayedAction(DelayedActionType.RegisterTransmitter, transmitter));
+            this.NotifyDrawersForWireUpdate(transmitter.parent.Position);
+        }
+
+        public void Notify_ConnectorWantsConnect(CompPipe wantingCon)
+        {
+            if (Scribe.mode == LoadSaveMode.Inactive && !this.HasRegisterConnectorDuplicate(wantingCon))
+            {
+                this.delayedActions.Add(new DelayedAction(DelayedActionType.RegisterConnector, wantingCon));
+            }
+            this.NotifyDrawersForWireUpdate(wantingCon.parent.Position);
+        }
+
+        public void Notify_ConnectorDespawned(CompPipe oldCon)
+        {
+            this.delayedActions.Add(new DelayedAction(DelayedActionType.DeregisterConnector, oldCon));
+            this.NotifyDrawersForWireUpdate(oldCon.parent.Position);
+        }
+
+        public void NotifyDrawersForWireUpdate(IntVec3 root)
+        {
+            this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.Things, true, false);
+            this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.PowerGrid, true, false);
+        }
+
+        public void RegisterPowerNet(NutrientPipeNet newNet)
+        {
+            this.allNets.Add(newNet);
+            newNet.pipeNetManager = this;
+            //this.map.powerNetGrid.Notify_PowerNetCreated(newNet);
+            PipeNetMaker.UpdateVisualLinkagesFor(newNet);
+        }
+
+        public void DeletePowerNet(NutrientPipeNet oldNet)
+        {
+            this.allNets.Remove(oldNet);
+            //this.map.powerNetGrid.Notify_PowerNetDeleted(oldNet);
+        }
+
+        public void PowerNetsTick()
+        {
+            for (int i = 0; i < this.allNets.Count; i++)
+            {
+                this.allNets[i].PowerNetTick();
             }
         }
 
-        public override void MapGenerated()
+        public void UpdatePipeNetsAndConnections_First()
         {
-            base.MapGenerated();
-            this.RegenGrids();
-        }
-
-        public void RegenGrids()
-        {
-            for (int i = 0; i < this.DirtyPipeFlag.Length; i++)
+            int count = this.delayedActions.Count;
+            for (int i = 0; i < count; i++)
             {
-                if (this.DirtyPipeFlag[i])
+                DelayedAction delayedAction = this.delayedActions[i];
+                DelayedActionType type = this.delayedActions[i].type;
+                if (type != DelayedActionType.RegisterTransmitter)
                 {
-                    this.RebuildPipeGrid(i);
-                }
-            }
-        }
-
-        public bool PerfectMatch(IntVec3 pos, PipeType P, int ID)
-        {
-            return this.PipeGrid[(int)P, this.map.cellIndices.CellToIndex(pos)] == ID;
-        }
-
-        public int IDAt(IntVec3 pos, PipeType P)
-        {
-            return this.PipeGrid[(int)P, this.map.cellIndices.CellToIndex(pos)];
-        }
-
-        public bool ZoneAt(IntVec3 pos, PipeType P)
-        {
-            return this.PipeGrid[(int)P, this.map.cellIndices.CellToIndex(pos)] >= 0;
-        }
-
-        public void RegisterPipe(CompPipe pipe, bool respawningAfterLoad)
-        {
-            if (!this.cachedPipes.Contains(pipe))
-            {
-                this.cachedPipes.Add(pipe);
-                this.cachedPipes.Shuffle<CompPipe>();
-            }
-            this.DirtyPipeGrid(pipe.mode);
-            if (!respawningAfterLoad)
-            {
-                this.RegenGrids();
-            }
-        }
-
-        public void DeregisterPipe(CompPipe pipe)
-        {
-            if (this.cachedPipes.Contains(pipe))
-            {
-                this.cachedPipes.Remove(pipe);
-                this.cachedPipes.Shuffle<CompPipe>();
-            }
-            this.DirtyPipeGrid(pipe.mode);
-            this.RegenGrids();
-        }
-
-        public void DirtyPipeGrid(PipeType p)
-        {
-            this.DirtyPipeFlag[(int)p] = true;
-        }
-
-        public void DirtyAllPipeGrids()
-        {
-            for (int i = 0; i < this.DirtyPipeFlag.Length; i++)
-            {
-                this.DirtyPipeFlag[i] = true;
-            }
-            this.RegenGrids();
-        }
-
-        public void RebuildPipeGrid(int P)
-        {
-            this.DirtyPipeFlag[P] = false;
-            for (int i = 0; i < this.PipeGrid.GetLength(1); i++)
-            {
-                this.PipeGrid[P, i] = -1;
-            }
-            this.PipeNets.RemoveAll((NutrientPipeNet x) => x.NetType == P);
-            (from x in this.cachedPipes
-             where x.mode == (PipeType)P
-             select x).ToList<CompPipe>().ForEach(delegate (CompPipe j)
-             {
-                 j.GridID = -1;
-             });
-            Func<CompPipe, bool> <> 9__7;
-            Func<CompPipe, bool> <> 9__6;
-            IEnumerable<CompPipe> source;
-            Func<CompPipe, bool> predicate;
-            for (CompPipe compPipe = this.cachedPipes.FirstOrDefault((CompPipe k) => k.mode == (PipeType)P && !k.closed && k.GridID == -1); compPipe != null; compPipe = source.FirstOrDefault(predicate))
-            {
-                NutrientPipeNet newNet = Activator.CreateInstance(compPipe.Props.PipeNetClass) as NutrientPipeNet;
-                newNet.MapComp = (this as MapComponent_Rimefeller);
-                newNet.NetID = this.masterID;
-                newNet.NetType = P;
-                this.PipeNets.Add(newNet);
-                Predicate<IntVec3> passCheck = delegate (IntVec3 c)
-                {
-                    foreach (ThingWithComps thingWithComps in c.GetThingList(this.map).OfType<ThingWithComps>())
+                    if (type == DelayedActionType.DeregisterTransmitter)
                     {
-                        IEnumerable<CompPipe> comps = thingWithComps.GetComps<CompPipe>();
-                        Func<CompPipe, bool> predicate2;
-                        if ((predicate2 = <> 9__7) == null)
-                        {
-                            predicate2 = (<> 9__7 = ((CompPipe x) => x.mode == (PipeType)P));
-                        }
-                        CompPipe compPipe2 = comps.FirstOrDefault(predicate2);
-                        if (compPipe2 != null && compPipe2.mode == (PipeType)P && !compPipe2.closed)
-                        {
-                            compPipe2.GridID = this.masterID;
-                            compPipe2.pipeNet = newNet;
-                            newNet.PipedThings.Add(compPipe2.parent);
-                            this.map.mapDrawer.MapMeshDirty(compPipe2.parent.Position, MapMeshFlag.Buildings);
-                            this.map.mapDrawer.MapMeshDirty(compPipe2.parent.Position, MapMeshFlag.Things);
-                            this.PipeGrid[P, this.map.cellIndices.CellToIndex(c)] = this.masterID;
-                            return true;
-                        }
+                        this.TryDestroyNetAt(delayedAction.position);
+                        PipeConnectionMaker.DisconnectAllFromTransmitterAndSetWantConnect(delayedAction.compPipe, this.map);
+                        delayedAction.compPipe.ResetPowerVars();
                     }
-                    return false;
-                };
-                Action<IntVec3> processor = delegate (IntVec3 c)
+                }
+                else if (delayedAction.position == delayedAction.compPipe.parent.Position)
                 {
-                };
-                this.map.floodFiller.FloodFill(compPipe.parent.Position, passCheck, processor, int.MaxValue, false, null);
-                this.masterID++;
-                source = this.cachedPipes;
-                if ((predicate = <> 9__6) == null)
-                {
-                    predicate = (<> 9__6 = ((CompPipe k) => k.mode == (PipeType)P && !k.closed && k.GridID == -1));
+                    ThingWithComps parent = delayedAction.compPipe.parent;
+                    if (this.map.powerNetGrid.TransmittedPowerNetAt(parent.Position) != null)
+                    {
+                        Log.Warning(string.Concat(new object[]
+                        {
+                            "Tried to register trasmitter ",
+                            parent,
+                            " at ",
+                            parent.Position,
+                            ", but there is already a power net here. There can't be two transmitters on the same cell."
+                        }), false);
+                    }
+                    delayedAction.compPipe.SetUpPowerVars();
+                    foreach (IntVec3 current in GenAdj.CellsAdjacentCardinal(parent))
+                    {
+                        this.TryDestroyNetAt(current);
+                    }
                 }
             }
-            foreach (NutrientPipeNet pipelineNet in this.PipeNets)
+            for (int j = 0; j < count; j++)
             {
-                pipelineNet.InitNet();
+                DelayedAction delayedAction2 = this.delayedActions[j];
+                if ((delayedAction2.type == DelayedActionType.RegisterTransmitter && delayedAction2.position == delayedAction2.compPipe.parent.Position) || delayedAction2.type == DelayedActionType.DeregisterTransmitter)
+                {
+                    this.TryCreateNetAt(delayedAction2.position);
+                    foreach (IntVec3 current2 in GenAdj.CellsAdjacentCardinal(delayedAction2.position, delayedAction2.rotation, delayedAction2.compPipe.parent.def.size))
+                    {
+                        this.TryCreateNetAt(current2);
+                    }
+                }
+            }
+            for (int k = 0; k < count; k++)
+            {
+                DelayedAction delayedAction3 = this.delayedActions[k];
+                DelayedActionType type2 = this.delayedActions[k].type;
+                if (type2 != DelayedActionType.RegisterConnector)
+                {
+                    if (type2 == DelayedActionType.DeregisterConnector)
+                    {
+                        PipeConnectionMaker.DisconnectFromPowerNet(delayedAction3.compPipe);
+                        delayedAction3.compPipe.ResetPowerVars();
+                    }
+                }
+                else if (delayedAction3.position == delayedAction3.compPipe.parent.Position)
+                {
+                    delayedAction3.compPipe.SetUpPowerVars();
+                    PipeConnectionMaker.TryConnectToAnyPowerNet(delayedAction3.compPipe, null);
+                }
+            }
+            this.delayedActions.RemoveRange(0, count);
+            if (DebugViewSettings.drawPower)
+            {
+                this.DrawDebugPowerNets();
             }
         }
 
-       
+        private bool HasRegisterConnectorDuplicate(CompPipe compPipe)
+        {
+            for (int i = this.delayedActions.Count - 1; i >= 0; i--)
+            {
+                if (this.delayedActions[i].compPipe == compPipe)
+                {
+                    if (this.delayedActions[i].type == DelayedActionType.DeregisterConnector)
+                    {
+                        return false;
+                    }
+                    if (this.delayedActions[i].type == DelayedActionType.RegisterConnector)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void TryCreateNetAt(IntVec3 cell)
+        {
+            if (!cell.InBounds(this.map))
+            {
+                return;
+            }
+            if (this.map.powerNetGrid.TransmittedPowerNetAt(cell) == null)
+            {
+                Building transmitter = cell.GetTransmitter(this.map);
+                if (transmitter != null && transmitter.TransmitsPowerNow)
+                {
+                    NutrientPipeNet pipeNet = PipeNetMaker.NewPowerNetStartingFrom(transmitter);
+                    this.RegisterPowerNet(pipeNet);
+                    for (int i = 0; i < pipeNet.transmitters.Count; i++)
+                    {
+                        PipeConnectionMaker.ConnectAllConnectorsToTransmitter(pipeNet.transmitters[i]);
+                    }
+                }
+            }
+        }
+
+        private void TryDestroyNetAt(IntVec3 cell)
+        {
+            if (!cell.InBounds(this.map))
+            {
+                return;
+            }
+            /*NutrientPipeNet powerNet = this.map.powerNetGrid.TransmittedPowerNetAt(cell);
+            if (powerNet != null)
+            {
+                this.DeletePowerNet(powerNet);
+            }*/
+        }
+
+        private void DrawDebugPowerNets()
+        {
+            if (Current.ProgramState != ProgramState.Playing)
+            {
+                return;
+            }
+            if (Find.CurrentMap != this.map)
+            {
+                return;
+            }
+            int num = 0;
+            foreach (NutrientPipeNet current in this.allNets)
+            {
+                foreach (CompPipe current2 in current.transmitters.Concat(current.connectors))
+                {
+                    foreach (IntVec3 current3 in GenAdj.CellsOccupiedBy(current2.parent))
+                    {
+                        CellRenderer.RenderCell(current3, (float)num * 0.44f);
+                    }
+                }
+                num++;
+            }
+        }
     }
 }
-
