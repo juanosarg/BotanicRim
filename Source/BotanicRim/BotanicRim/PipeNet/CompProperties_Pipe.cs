@@ -5,10 +5,12 @@ namespace BotanicRim
 {
     public class CompProperties_Pipe : CompProperties
     {
-        public CompProperties_Pipe()
-        {
-            this.compClass = typeof(CompPipe);
-        }
+       
         public bool transmitsPower = true;
+        public float basePowerConsumption;
+        public bool shortCircuitInRain;
+        public SoundDef soundPowerOn;
+        public SoundDef soundPowerOff;
+        public SoundDef soundAmbientPowered;
     }
 }

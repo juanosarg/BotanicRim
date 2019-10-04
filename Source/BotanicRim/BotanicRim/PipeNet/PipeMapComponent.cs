@@ -63,12 +63,15 @@ namespace BotanicRim
 
         public override void MapComponentTick()
         {
-            base.MapComponentTick();
             this.UpdatePipeNetsAndConnections_First();
+            this.PowerNetsTick();
+            base.MapComponentTick();
+            
         }
 
         public void Notify_TransmitterSpawned(CompPipe newTransmitter)
         {
+           
             this.delayedActions.Add(new DelayedAction(DelayedActionType.RegisterTransmitter, newTransmitter));
             this.NotifyDrawersForWireUpdate(newTransmitter.parent.Position);
         }
@@ -115,14 +118,14 @@ namespace BotanicRim
         {
             this.allNets.Add(newNet);
             newNet.pipeNetManager = this;
-            //this.map.powerNetGrid.Notify_PowerNetCreated(newNet);
+            this.map.GetComponent<PipeNetGrid>().Notify_PowerNetCreated(newNet);
             PipeNetMaker.UpdateVisualLinkagesFor(newNet);
         }
 
         public void DeletePowerNet(NutrientPipeNet oldNet)
         {
             this.allNets.Remove(oldNet);
-            //this.map.powerNetGrid.Notify_PowerNetDeleted(oldNet);
+            this.map.GetComponent<PipeNetGrid>().Notify_PowerNetDeleted(oldNet);
         }
 
         public void PowerNetsTick()
@@ -135,7 +138,9 @@ namespace BotanicRim
 
         public void UpdatePipeNetsAndConnections_First()
         {
+           
             int count = this.delayedActions.Count;
+            
             for (int i = 0; i < count; i++)
             {
                 DelayedAction delayedAction = this.delayedActions[i];
@@ -152,7 +157,7 @@ namespace BotanicRim
                 else if (delayedAction.position == delayedAction.compPipe.parent.Position)
                 {
                     ThingWithComps parent = delayedAction.compPipe.parent;
-                    if (this.map.powerNetGrid.TransmittedPowerNetAt(parent.Position) != null)
+                    if (this.map.GetComponent<PipeNetGrid>().TransmittedPowerNetAt(parent.Position) != null)
                     {
                         Log.Warning(string.Concat(new object[]
                         {
@@ -228,14 +233,16 @@ namespace BotanicRim
 
         private void TryCreateNetAt(IntVec3 cell)
         {
+            
             if (!cell.InBounds(this.map))
             {
                 return;
             }
-            if (this.map.powerNetGrid.TransmittedPowerNetAt(cell) == null)
+            if (this.map.GetComponent<PipeNetGrid>().TransmittedPowerNetAt(cell) == null)
             {
-                Building transmitter = cell.GetTransmitter(this.map);
-                if (transmitter != null && transmitter.TransmitsPowerNow)
+                Building transmitter = GetPipeTransmitter(cell,this.map);
+                //Log.Message(transmitter.ToString());
+                if (transmitter != null && GetPipeTransmission(transmitter))
                 {
                     NutrientPipeNet pipeNet = PipeNetMaker.NewPowerNetStartingFrom(transmitter);
                     this.RegisterPowerNet(pipeNet);
@@ -247,17 +254,51 @@ namespace BotanicRim
             }
         }
 
+        public Building GetPipeTransmitter(IntVec3 c, Map map)
+        {
+            List<Thing> list = map.thingGrid.ThingsListAt(c);
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (EverTransmitsPipe(list[i].def))
+                {
+                    return (Building)list[i];
+                }
+            }
+            return null;
+        }
+
+        public bool GetPipeTransmission(Building transmitter)
+        {
+            CompPipe pipeComp = transmitter.GetComp<CompPipe>();
+            return pipeComp != null && pipeComp.Props.transmitsPower;
+        }
+
+        public bool EverTransmitsPipe(ThingDef thingdef)
+        {
+           
+                for (int i = 0; i < thingdef.comps.Count; i++)
+                {
+                    CompProperties_Pipe compProperties_Pipe = thingdef.comps[i] as CompProperties_Pipe;
+                    if (compProperties_Pipe != null && compProperties_Pipe.transmitsPower)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+           
+        }
+
         private void TryDestroyNetAt(IntVec3 cell)
         {
             if (!cell.InBounds(this.map))
             {
                 return;
             }
-            /*NutrientPipeNet powerNet = this.map.powerNetGrid.TransmittedPowerNetAt(cell);
+            NutrientPipeNet powerNet = this.map.GetComponent<PipeNetGrid>().TransmittedPowerNetAt(cell);
             if (powerNet != null)
             {
                 this.DeletePowerNet(powerNet);
-            }*/
+            }
         }
 
         private void DrawDebugPowerNets()

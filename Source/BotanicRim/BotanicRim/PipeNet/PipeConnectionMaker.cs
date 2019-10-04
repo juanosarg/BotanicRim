@@ -27,11 +27,11 @@ namespace BotanicRim
             {
                 CompPipe compPipe = deadPc.connectChildren[i];
                 compPipe.connectParent = null;
-                /*CompPowerTrader compPowerTrader = compPipe as CompPowerTrader;
-                if (compPowerTrader != null)
+                CompPipeTrader compPipeTrader = compPipe as CompPipeTrader;
+                if (compPipeTrader != null)
                 {
-                    compPowerTrader.PowerOn = false;
-                }*/
+                    compPipeTrader.PowerOn = false;
+                }
                 map.GetComponent<PipeMapComponent>().Notify_ConnectorWantsConnect(compPipe);
             }
         }
@@ -118,16 +118,16 @@ namespace BotanicRim
                     Building transmitter = c.GetTransmitter(map);
                     if (transmitter != null && !transmitter.Destroyed)
                     {
-                        CompPipe powerComp = transmitter.GetComp<CompPipe>();
-                        if (powerComp != null && powerComp.TransmitsPowerNow && (transmitter.def.building == null || transmitter.def.building.allowWireConnection))
+                        CompPipe pipeComp = transmitter.GetComp<CompPipe>();
+                        if (pipeComp != null && pipeComp.TransmitsPowerNow && (transmitter.def.building == null || transmitter.def.building.allowWireConnection))
                         {
-                            if (disallowedNets == null || !disallowedNets.Contains(powerComp.transNet))
+                            if (disallowedNets == null || !disallowedNets.Contains(pipeComp.transNet))
                             {
                                 float num2 = (float)(transmitter.Position - connectorPos).LengthHorizontalSquared;
                                 if (num2 < num)
                                 {
                                     num = num2;
-                                    result = powerComp;
+                                    result = pipeComp;
                                 }
                             }
                         }

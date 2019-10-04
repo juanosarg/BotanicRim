@@ -17,9 +17,9 @@ namespace BotanicRim
 
         public List<CompPipe> transmitters = new List<CompPipe>();
 
-        public List<CompPowerTrader> powerComps = new List<CompPowerTrader>();
+        public List<CompPipeTrader> powerComps = new List<CompPipeTrader>();
 
-        public List<CompPowerBattery> batteryComps = new List<CompPowerBattery>();
+        public List<CompPipeTank> batteryComps = new List<CompPipeTank>();
 
         private float debugLastCreatedEnergy;
 
@@ -39,13 +39,13 @@ namespace BotanicRim
 
         private const float MinStoredEnergyToTurnOn = 5f;
 
-        private static List<CompPowerTrader> partsWantingPowerOn = new List<CompPowerTrader>();
+        private static List<CompPipeTrader> partsWantingPowerOn = new List<CompPipeTrader>();
 
-        private static List<CompPowerTrader> potentialShutdownParts = new List<CompPowerTrader>();
+        private static List<CompPipeTrader> potentialShutdownParts = new List<CompPipeTrader>();
 
-        private List<CompPowerBattery> givingBats = new List<CompPowerBattery>();
+        private List<CompPipeTank> givingBats = new List<CompPipeTank>();
 
-        private static List<CompPowerBattery> batteriesShuffled = new List<CompPowerBattery>();
+        private static List<CompPipeTank> batteriesShuffled = new List<CompPipeTank>();
 
         public NutrientPipeNet(IEnumerable<CompPipe> newTransmitters)
         {
@@ -103,19 +103,19 @@ namespace BotanicRim
 
         private bool IsPowerSource(CompPipe cp)
         {
-            return false;// cp is CompPowerBattery || (cp is CompPowerTrader && cp.Props.basePowerConsumption < 0f);
+            return  cp is CompPipeTank || (cp is CompPipeTank && cp.Props.basePowerConsumption < 0f);
         }
 
         private bool IsActivePowerSource(CompPipe cp)
         {
-            /*CompPowerBattery compPowerBattery = cp as CompPowerBattery;
+            CompPipeTank compPowerBattery = cp as CompPipeTank;
             if (compPowerBattery != null && compPowerBattery.StoredEnergy > 0f)
             {
                 return true;
             }
-            CompPowerTrader compPowerTrader = cp as CompPowerTrader;
-            return compPowerTrader != null && compPowerTrader.PowerOutput > 0f;*/
-            return false;
+            CompPipeTrader compPowerTrader = cp as CompPipeTrader;
+            return compPowerTrader != null && compPowerTrader.PowerOutput > 0f;
+            
         }
 
         public void RegisterConnector(CompPipe b)
@@ -137,7 +137,7 @@ namespace BotanicRim
 
         private void RegisterAllComponentsOf(ThingWithComps parentThing)
         {
-            CompPowerTrader comp = parentThing.GetComp<CompPowerTrader>();
+            CompPipeTrader comp = parentThing.GetComp<CompPipeTrader>();
             if (comp != null)
             {
                 if (this.powerComps.Contains(comp))
@@ -149,7 +149,7 @@ namespace BotanicRim
                     this.powerComps.Add(comp);
                 }
             }
-            CompPowerBattery comp2 = parentThing.GetComp<CompPowerBattery>();
+            CompPipeTank comp2 = parentThing.GetComp<CompPipeTank>();
             if (comp2 != null)
             {
                 if (this.batteryComps.Contains(comp2))
@@ -165,12 +165,12 @@ namespace BotanicRim
 
         private void DeregisterAllComponentsOf(ThingWithComps parentThing)
         {
-            CompPowerTrader comp = parentThing.GetComp<CompPowerTrader>();
+            CompPipeTrader comp = parentThing.GetComp<CompPipeTrader>();
             if (comp != null)
             {
                 this.powerComps.Remove(comp);
             }
-            CompPowerBattery comp2 = parentThing.GetComp<CompPowerBattery>();
+            CompPipeTank comp2 = parentThing.GetComp<CompPipeTank>();
             if (comp2 != null)
             {
                 this.batteryComps.Remove(comp2);
@@ -208,7 +208,7 @@ namespace BotanicRim
         {
             float num = this.CurrentEnergyGainRate();
             float num2 = this.CurrentStoredEnergy();
-            if (num2 + num >= -1E-07f && !this.Map.gameConditionManager.ConditionIsActive(GameConditionDefOf.SolarFlare))
+            if (num2 + num >= -1E-07f)
             {
                 float num3;
                 if (this.batteryComps.Count > 0 && num2 >= 0.1f)
@@ -247,7 +247,7 @@ namespace BotanicRim
                             int num5 = Mathf.Max(1, Mathf.RoundToInt((float)partsWantingPowerOn.Count * 0.05f));
                             for (int j = 0; j < num5; j++)
                             {
-                                CompPowerTrader compPowerTrader = partsWantingPowerOn.RandomElement<CompPowerTrader>();
+                                CompPipeTrader compPowerTrader = partsWantingPowerOn.RandomElement<CompPipeTrader>();
                                 if (!compPowerTrader.PowerOn)
                                 {
                                     if (num + num2 >= -(compPowerTrader.EnergyOutputPerTick + 1E-07f))
@@ -277,7 +277,7 @@ namespace BotanicRim
                     int num6 = Mathf.Max(1, Mathf.RoundToInt((float)potentialShutdownParts.Count * 0.05f));
                     for (int l = 0; l < num6; l++)
                     {
-                        potentialShutdownParts.RandomElement<CompPowerTrader>().PowerOn = false;
+                        potentialShutdownParts.RandomElement<CompPipeTrader>().PowerOn = false;
                     }
                 }
             }
@@ -329,13 +329,13 @@ namespace BotanicRim
 
         private void DistributeEnergyAmongBatteries(float energy)
         {
-            if (energy <= 0f || !this.batteryComps.Any<CompPowerBattery>())
+            if (energy <= 0f || !this.batteryComps.Any<CompPipeTank>())
             {
                 return;
             }
             batteriesShuffled.Clear();
             batteriesShuffled.AddRange(this.batteryComps);
-            batteriesShuffled.Shuffle<CompPowerBattery>();
+            batteriesShuffled.Shuffle<CompPipeTank>();
             int num = 0;
             for (; ; )
             {
@@ -367,7 +367,7 @@ namespace BotanicRim
                         batteriesShuffled.RemoveAt(j);
                     }
                 }
-                if (energy < 0.0005f || !batteriesShuffled.Any<CompPowerBattery>())
+                if (energy < 0.0005f || !batteriesShuffled.Any<CompPipeTank>())
                 {
                     goto IL_190;
                 }

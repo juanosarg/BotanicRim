@@ -3,6 +3,16 @@
 
 	<RB_BotanicsGrowingZone>Botany Growing Zone</RB_BotanicsGrowingZone>
 	<RB_DesignatorGrowingZoneDesc>Create a zone where your colonists will try to grow Botanically enhanced plants.</RB_DesignatorGrowingZoneDesc>
+	
+	<BR_PipesNotConnected>Pipes not connected to generator or reservoirs</BR_PipesNotConnected>
+	<BR_PipeConnectedRateStored>Pipe grid excess/stored: {0} ml / {1} ml-d</BR_PipeConnectedRateStored>
+	<BR_LiquidTankStored>Liquid stored</BR_LiquidTankStored>
+    <BR_LiquidTankEfficiency>Tank efficiency</BR_LiquidTankEfficiency>
+    <BR_TankLeakage>Minimum sealant leakage</BR_TankLeakage>
+	
+	<GR_NutrientNeeded>Liquid nutrient needed</GR_NutrientNeeded>
+    <GR_LiquidOutput>Liquid output</GR_LiquidOutput>
+
 
 
 

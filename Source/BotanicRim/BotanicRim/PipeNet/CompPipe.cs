@@ -86,18 +86,20 @@ namespace BotanicRim
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
+            
             base.PostSpawnSetup(respawningAfterLoad);
-            if (this.Props.transmitsPower || this.parent.def.ConnectToPower)
+            if (this.Props.transmitsPower)
             {
                 this.parent.Map.mapDrawer.MapMeshDirty(this.parent.Position, MapMeshFlag.PowerGrid, true, false);
                 if (this.Props.transmitsPower)
                 {
+                   
                     this.parent.Map.GetComponent<PipeMapComponent>().Notify_TransmitterSpawned(this);
                 }
-                if (this.parent.def.ConnectToPower)
+                /*if (this.parent.def.ConnectToPower)
                 {
                     this.parent.Map.GetComponent<PipeMapComponent>().Notify_ConnectorWantsConnect(this);
-                }
+                }*/
                 this.SetUpPowerVars();
             }
         }
@@ -197,11 +199,11 @@ namespace BotanicRim
         {
             if (this.NutrientPipeNet == null)
             {
-                return "PowerNotConnected".Translate();
+                return "BR_PipesNotConnected".Translate();
             }
-            string value = (this.NutrientPipeNet.CurrentEnergyGainRate() / CompPower.WattsToWattDaysPerTick).ToString("F0");
+            string value = (this.NutrientPipeNet.CurrentEnergyGainRate() / CompPipe.WattsToWattDaysPerTick).ToString("F0");
             string value2 = this.NutrientPipeNet.CurrentStoredEnergy().ToString("F0");
-            return "PowerConnectedRateStored".Translate(value, value2);
+            return "BR_PipeConnectedRateStored".Translate(value, value2);
         }
 
        
