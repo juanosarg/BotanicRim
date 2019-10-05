@@ -25,7 +25,9 @@ namespace BotanicRim
         {
             get
             {
-                return ((Building)this.parent).TransmitsPowerNow;
+                return this.Props.transmitsPower;
+
+
             }
         }
 
@@ -142,7 +144,7 @@ namespace BotanicRim
             base.PostPrintOnto(layer);
             if (this.connectParent != null)
             {
-                PowerNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, false);
+                PipeNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, false);
             }
         }
 
@@ -150,16 +152,18 @@ namespace BotanicRim
         {
             if (this.TransmitsPowerNow)
             {
-                PowerOverlayMats.LinkedOverlayGraphic.Print(layer, this.parent);
+               
+                PipeOverlayMats.LinkedOverlayGraphic.Print(layer, this.parent);
             }
-            if (this.parent.def.ConnectToPower)
+            if (this.parent.GetComp<CompPipe>().Props.transmitsPower)
             {
-                PowerNetGraphics.PrintOverlayConnectorBaseFor(layer, this.parent);
+                
+                PipeNetGraphics.PrintOverlayConnectorBaseFor(layer, this.parent);
             }
-            if (this.connectParent != null)
+            /*if (this.connectParent != null)
             {
-                PowerNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, true);
-            }
+                PipeNetGraphics.PrintWirePieceConnecting(layer, this.parent, this.connectParent.parent, true);
+            }*/
         }
 
 

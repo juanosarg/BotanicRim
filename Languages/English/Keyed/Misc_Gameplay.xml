@@ -2,7 +2,7 @@
 <LanguageData>
 
 	<RB_BotanicsGrowingZone>Botany Growing Zone</RB_BotanicsGrowingZone>
-	<RB_DesignatorGrowingZoneDesc>Create a zone where your colonists will try to grow Botanically enhanced plants.</RB_DesignatorGrowingZoneDesc>
+	<RB_DesignatorGrowingZoneDesc>Create a zone where your colonists will try to grow Botanically enhanced plants.\n\nThese zones will just be glorified potato patches until you can research basic Xenobotany.</RB_DesignatorGrowingZoneDesc>
 	
 	<BR_PipesNotConnected>Pipes not connected to generator or reservoirs</BR_PipesNotConnected>
 	<BR_PipeConnectedRateStored>Pipe grid excess/stored: {0} ml / {1} ml-d</BR_PipeConnectedRateStored>

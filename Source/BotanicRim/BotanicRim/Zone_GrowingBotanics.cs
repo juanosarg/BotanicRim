@@ -47,6 +47,11 @@ namespace BotanicRim
 
         public Zone_GrowingBotanics()
         {
+            if (ResearchProjectDef.Named("BR_Xenobotany").IsFinished) {
+                this.plantDefToGrow = ThingDef.Named("BR_NutrientBrothPlant");
+            } else plantDefToGrow = ThingDefOf.Plant_Potato;
+               
+           
         }
 
         public Zone_GrowingBotanics(ZoneManager zoneManager) : base("GrowingZone".Translate(), zoneManager)
@@ -111,19 +116,23 @@ namespace BotanicRim
             {
                 yield return g;
             }
-            yield return PlantToGrowSettableUtility.SetPlantToGrowCommand(this);
-            yield return new Command_Toggle
+            if (ResearchProjectDef.Named("BR_Xenobotany").IsFinished)
             {
-                defaultLabel = "CommandAllowSow".Translate(),
-                defaultDesc = "CommandAllowSowDesc".Translate(),
-                hotKey = KeyBindingDefOf.Command_ItemForbid,
-                icon = TexCommand.ForbidOff,
-                isActive = (() => this.allowSow),
-                toggleAction = delegate
+                yield return PlantToGrowSettableUtility.SetPlantToGrowCommand(this);
+                yield return new Command_Toggle
                 {
-                    this.allowSow = !this.allowSow;
-                }
-            };
+                    defaultLabel = "CommandAllowSow".Translate(),
+                    defaultDesc = "CommandAllowSowDesc".Translate(),
+                    hotKey = KeyBindingDefOf.Command_ItemForbid,
+                    icon = TexCommand.ForbidOff,
+                    isActive = (() => this.allowSow),
+                    toggleAction = delegate
+                    {
+                        this.allowSow = !this.allowSow;
+                    }
+                };
+            }
+                
         }
 
         [DebuggerHidden]
@@ -134,7 +143,12 @@ namespace BotanicRim
 
         public ThingDef GetPlantDefToGrow()
         {
-            return this.plantDefToGrow;
+            if (ResearchProjectDef.Named("BR_Xenobotany").IsFinished)
+            {
+                return this.plantDefToGrow;
+            }
+            return ThingDefOf.Plant_Potato;
+         
         }
 
         public void SetPlantDefToGrow(ThingDef plantDef)

@@ -110,8 +110,8 @@ namespace BotanicRim
 
         public void NotifyDrawersForWireUpdate(IntVec3 root)
         {
-            this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.Things, true, false);
-            this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.PowerGrid, true, false);
+            //this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.Things, true, false);
+            //this.map.mapDrawer.MapMeshDirty(root, MapMeshFlag.PowerGrid, true, false);
         }
 
         public void RegisterPowerNet(NutrientPipeNet newNet)

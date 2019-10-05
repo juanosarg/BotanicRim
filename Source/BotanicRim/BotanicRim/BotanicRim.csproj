@@ -67,8 +67,10 @@
     <Compile Include="PipeNet\NutrientPipeNet.cs" />
     <Compile Include="PipeNet\PipeConnectionMaker.cs" />
     <Compile Include="PipeNet\PipeMapComponent.cs" />
+    <Compile Include="PipeNet\PipeNetGraphics.cs" />
     <Compile Include="PipeNet\PipeNetGrid.cs" />
     <Compile Include="PipeNet\PipeNetMaker.cs" />
+    <Compile Include="PipeNet\PipeOverlayMats.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkGiver_GrowerBotany.cs" />
     <Compile Include="WorkGiver_GrowerHarvestBotany.cs" />

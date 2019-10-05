@@ -3,7 +3,7 @@
 <Defs>
 
 
-    <ThingDef Abstract="True" ParentName="ResourceBase" Name="RBK_IntermediateProduct">
+    <ThingDef Abstract="True" ParentName="ResourceBase" Name="BR_IntermediateProduct">
     <graphicData>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
@@ -23,12 +23,12 @@
   </ThingDef>
 
 
-  <ThingDef ParentName="RBK_IntermediateProduct">
-    <defName>RBK_Sugar</defName>
+  <ThingDef ParentName="BR_IntermediateProduct">
+    <defName>BR_Sugar</defName>
     <label>sugar</label>
     <description>Refined white sugar extracted from sugar beets.</description>
    <graphicData>
-      <texPath>Things/Item/RBK_Sugar</texPath>
+      <texPath>Things/Item/BR_Sugar</texPath>
     </graphicData>
     <statBases>
       <MarketValue>4</MarketValue>
@@ -37,12 +37,12 @@
   </ThingDef>
 
 
-<ThingDef ParentName="RBK_IntermediateProduct">
-    <defName>RBK_WheatFlour</defName>
+<ThingDef ParentName="BR_IntermediateProduct">
+    <defName>BR_WheatFlour</defName>
     <label>wheat flour</label>
     <description>Refined wheat flour, used in baking. Wheat flour takes a very long time to go bad, if stored in a dry environment.</description>
     <graphicData>
-      <texPath>Things/Item/RBK_WheatFlour</texPath>
+      <texPath>Things/Item/BR_WheatFlour</texPath>
     </graphicData>
     <statBases>
       <MarketValue>4</MarketValue>

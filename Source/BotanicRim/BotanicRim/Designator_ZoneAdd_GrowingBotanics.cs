@@ -17,12 +17,14 @@ namespace BotanicRim
 
         public Designator_ZoneAdd_GrowingBotanics()
         {
+           
             this.zoneTypeToPlace = typeof(Zone_GrowingBotanics);
             this.defaultLabel = "RB_BotanicsGrowingZone".Translate();
             this.defaultDesc = "RB_DesignatorGrowingZoneDesc".Translate();
             this.icon = ContentFinder<Texture2D>.Get("UI/Designators/RB_ZoneCreate_GrowingBotanic", true);
             this.hotKey = KeyBindingDefOf.Misc2;
-          //  this.tutorTag = "ZoneAdd_Growing";
+           
+            //  this.tutorTag = "ZoneAdd_Growing";
         }
 
         public override AcceptanceReport CanDesignateCell(IntVec3 c)

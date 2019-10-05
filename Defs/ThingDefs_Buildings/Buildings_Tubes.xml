@@ -56,18 +56,20 @@
     <neverMultiSelect>true</neverMultiSelect>
     <soundImpactDefault>BulletImpact_Metal</soundImpactDefault>
     <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
-    <designationCategory>RBK_Botanics</designationCategory>
+    <designationCategory>BR_Botany</designationCategory>
     <constructEffect>ConstructMetal</constructEffect>
     <clearBuildingArea>false</clearBuildingArea>
     <designationHotKey>Misc1</designationHotKey>
-    
+     <researchPrerequisites>
+      <li>BR_NutrientBrothPipes</li>
+    </researchPrerequisites>
   </ThingDef>
   
   
   
   <ThingDef ParentName="BuildingBase">
     <defName>BR_NutrientBrothProcessor</defName>
-    <label>nutrient broth processor</label>
+    <label>nutrient broth generator</label>
     <description>Produces power by consuming wood. Must be periodically loaded with wood fuel by hand.</description>
     <thingClass>Building</thingClass>
     <graphicData>
@@ -123,11 +125,11 @@
       <li Class="CompProperties_Breakdownable"/>
     </comps>
     <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
-    <designationCategory>RBK_Botanics</designationCategory>
+    <designationCategory>BR_Botany</designationCategory>
     <designationHotKey>Misc3</designationHotKey>
     <constructEffect>ConstructMetal</constructEffect>
     <researchPrerequisites>
-      <li>Electricity</li>
+      <li>BR_NutrientBrothPipes</li>
     </researchPrerequisites>
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
   </ThingDef>
@@ -183,13 +185,13 @@
       <li Class="CompProperties_Breakdownable"/>
     </comps>
     <terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
-    <designationCategory>RBK_Botanics</designationCategory>
+    <designationCategory>BR_Botany</designationCategory>
    
     <constructEffect>ConstructMetal</constructEffect>
     <designationHotKey>Misc4</designationHotKey>
     <canOverlapZones>false</canOverlapZones>
     <researchPrerequisites>
-      <li>Electricity</li>
+      <li>BR_NutrientBrothPipes</li>
     </researchPrerequisites>
   </ThingDef>
 

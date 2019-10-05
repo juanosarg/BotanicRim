@@ -35,6 +35,25 @@
     </requiredCapacities>
   </WorkGiverDef>
   
+  <!-- Workbenches -->
+  
+  	<WorkGiverDef>
+		<defName>BR_DoBillsBotanyWB</defName>
+		<label>works at botany workbench</label>
+		<giverClass>WorkGiver_DoBill</giverClass>
+		<workType>Crafting</workType>
+		<priorityInType>100</priorityInType>
+		<fixedBillGiverDefs>
+			<li>BR_BotanyWorkbench</li>
+		</fixedBillGiverDefs>
+		<verb>work at botany workbench</verb>
+		<gerund>working at botany workbench</gerund>
+		<requiredCapacities>
+			<li>Manipulation</li>
+		</requiredCapacities>
+		<prioritizeSustains>true</prioritizeSustains>
+	</WorkGiverDef>
+  
  
 
 </Defs>

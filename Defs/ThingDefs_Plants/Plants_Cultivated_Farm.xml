@@ -36,9 +36,10 @@
 			</visualSizeRange>
 			<wildOrder>2</wildOrder>
 		</plant>
+		<researchPrerequisites><li>BR_Xenobotany</li></researchPrerequisites>
 	</ThingDef>
 
-	<ThingDef ParentName="PlantBase">
+<!--	<ThingDef ParentName="PlantBase">
 		<defName>BR_Plant_CommonWheat</defName>
 		<label>common wheat plant</label>
 		<description>Wheat is a grass widely cultivated for its seed, a cereal grain. Wheat has a protein content of about 13%, which is relatively high compared to other major cereals.</description>
@@ -76,7 +77,7 @@
 		</plant>
 	</ThingDef>
 
-	<!--  <ThingDef ParentName="PlantBase">
+ <ThingDef ParentName="PlantBase">
     <defName>RBK_Plant_SugarBeet</defName>
     <label>sugar beet plant</label>
     <description>A sugar beet is a plant whose root contains a high concentration of sucrose and which is grown for sugar production. Sugar beets grow exclusively in the temperate zone, in contrast to sugarcane, which grows exclusively in the tropical and subtropical zones.</description>

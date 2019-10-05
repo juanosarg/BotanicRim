@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ResearchProjectDef>
+    <defName>BR_Xenobotany</defName>
+    <label>basic xenobotany</label>
+    <tab>BR_BotanicRim</tab>
+    <techLevel>Industrial</techLevel>
+    <description>The study of alien plants, and by extension of terran plants in alien environments.\n\nThis research unlocks basic Botany growing zones, the Nutrient plant and the Botany Workbench.</description>
+    <baseCost>500</baseCost>
+     <prerequisites>
+      <li>Electricity</li>
+    </prerequisites>   
+	<researchViewX>0</researchViewX>
+	<researchViewY>0</researchViewY>
+  </ResearchProjectDef>
+  
+    <ResearchProjectDef>
+    <defName>BR_NutrientBrothPipes</defName>
+    <label>nutrient pipes</label>
+    <tab>BR_BotanicRim</tab>
+    <techLevel>Industrial</techLevel>
+    <description>This research unlocks the building of nutrient pipe networks, including nutrient broth generators, nutrient reservoirs, and the pipes themselves. Nutrient broth is a resource that will be in constant need by most of the machines needed to conduct botanical experiments.</description>
+    <baseCost>1000</baseCost>
+     <prerequisites>
+      <li>BR_Xenobotany</li>
+    </prerequisites>   
+	<researchViewX>0</researchViewX>
+	<researchViewY>1</researchViewY>
+  </ResearchProjectDef>
+
+ 
+
+  
+</Defs>

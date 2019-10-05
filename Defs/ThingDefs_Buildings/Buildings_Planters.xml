@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs> 
 
-	<ThingDef ParentName="BuildingBase">
+	<!--<ThingDef ParentName="BuildingBase">
 		<defName>BR_BasicFoodPlanter</defName>
 		<label>basic food planter (tier 1)</label>
 		<description>An artificial nutrient bath for growing plants. The nutrients pumps must work continuously; the plants will die if power is cut.</description>
@@ -58,7 +58,7 @@
 		<terrainAffordanceNeeded>Medium</terrainAffordanceNeeded>
 		<designationCategory>RBK_Botanics</designationCategory>
 	</ThingDef>
-
+-->
 
 
 
