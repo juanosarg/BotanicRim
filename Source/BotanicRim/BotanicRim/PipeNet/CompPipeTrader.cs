@@ -3,6 +3,7 @@ using System.Text;
 using Verse;
 using Verse.Sound;
 using RimWorld;
+using UnityEngine;
 
 namespace BotanicRim
 {
@@ -173,6 +174,15 @@ namespace BotanicRim
                     }
                 }
             }
+        }
+
+        private void RenderPulsingOverlayInternal(Thing thing, Material mat, Vector3 drawPos, Mesh mesh)
+        {
+            float num = (Time.realtimeSinceStartup + 397f * (float)(thing.thingIDNumber % 571)) * 4f;
+            float num2 = ((float)Math.Sin((double)num) + 1f) * 0.5f;
+            num2 = 0.3f + num2 * 0.7f;
+            Material material = FadedMaterialPool.FadedVersionOf(mat, num2);
+            Graphics.DrawMesh(mesh, drawPos, Quaternion.identity, material, 0);
         }
 
         public override void SetUpPowerVars()
